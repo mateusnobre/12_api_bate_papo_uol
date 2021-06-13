@@ -24,7 +24,6 @@ const messages = [];
 
 app.post("/participants", (req, res) => {
     try {
-        participantSchema.validate(req.body)
         let participant = {
             name: '',
             lastStatus: '',
@@ -36,6 +35,7 @@ app.post("/participants", (req, res) => {
             type: '',
             time: ''
         }
+        console.log(req.body)
         const newMessage = req.body
         message.from = newMessage.name
         message.to = 'Todos'
@@ -44,6 +44,7 @@ app.post("/participants", (req, res) => {
         message.time = (new Date()).toLocaleTimeString()
         participant.name = stripHtml(newMessage.name).result.trim();
         participant.lastStatus = Date.now();
+        participantSchema.validate(participant)
         participants.push(participant);
         messages.push(message)
         res.status(200).send('Usuário Cadastrado');
@@ -58,6 +59,10 @@ app.get("/participants", (req, res) => {
 })
 
 app.post("/messages", (req, res) => {
+    if (!req.body.type === 'message' && !req.body.type === 'private_message'){
+        res.status(404).send('Tipo de mensagem inválido')
+    }
+    else {
     try{
         let message = {
             from: '',
@@ -71,16 +76,14 @@ app.post("/messages", (req, res) => {
         message.to = stripHtml(newMessage.to).result.trim()
         message.text = stripHtml(newMessage.text).result.trim()
         message.type = stripHtml(newMessage.type).result.trim()
-        if (message.type === 'message' || message.type === 'private_message'){
-            res.status(404).send('Erro na validação dos dados')
-        }
         message.time = (new Date()).toLocaleTimeString()
         messageSchema.validate(message);
         messages.push(message)
-        res.status(200).send('Messagem enviada')}
+        res.status(200).send('Messagem enviada')
+    }
     catch (error){
         res.status(404).send('Erro na validação dos dados')
-    }
+    }}
 })
 
 app.get("/messages", (req, res) => {
