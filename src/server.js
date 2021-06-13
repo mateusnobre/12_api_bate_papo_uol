@@ -99,4 +99,14 @@ app.get("/messages", (req, res) => {
     }
 })
 
+app.post("/status", (req, res) => {
+    if (participants.includes(req.headers.user)){
+        participants.find(participant => participant.name = req.headers.name).lastStatus = Date.now();
+        res.status(200).send('Status de Usuário Atualizado')
+    }
+    else {
+        res.status(404).send("")
+    }
+})
+
 app.listen(process.env.PORT || 4000) 
