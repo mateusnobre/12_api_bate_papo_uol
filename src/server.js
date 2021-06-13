@@ -73,8 +73,24 @@ app.post("/messages", (req, res) => {
         message.type = stripHtml(newMessage.type).result.trim()
         message.time = (new Date()).toLocaleTimeString()
         messageSchema.validate(message);
+        messages.push(message)
         res.status(200).send('Messagem enviada')}
     catch (error){
+        res.status(404).send('Erro na validação dos dados')
+    }
+})
+
+app.get("/messages", (req, res) => {
+    try {
+        if (typeof req.query.limit != 'undefined'){
+            let limit = parseInt(req.query.limit)
+            res.status(200).send(messages.slice(-limit))
+        }
+        else {
+            res.status(200).send(messages)
+        }
+    }
+    catch {
         res.status(404).send('Erro na validação dos dados')
     }
 })
