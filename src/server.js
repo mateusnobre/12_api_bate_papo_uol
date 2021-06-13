@@ -42,7 +42,7 @@ app.post("/participants", (req, res) => {
         message.text = 'entra na sala...'
         message.type = 'status'
         message.time = (new Date()).toLocaleTimeString()
-        participant.name = trim(stripHtml(newMessage.name));
+        participant.name = stripHtml(newMessage.name).result.trim();
         participant.lastStatus = Date.now();
         participants.push(participant);
         messages.push(message)
@@ -59,20 +59,21 @@ app.get("/participants", (req, res) => {
 
 app.post("/messages", (req, res) => {
     try{
-    let message = {
-        from: '',
-        to: '',
-        text: '',
-        type: '',
-        time: ''
-    }
-    const newMessage = req.body
-    message.from = trim(stripHtml(req.headers.User))
-    message.to = trim(stripHtml(newMessage.to))
-    message.text = trim(stripHtml(newMessage.text))
-    message.type = trim(stripHtml(newMessage.type))
-    message.time = (new Date()).toLocaleTimeString()
-    res.status(200).send('Messagem enviada')}
+        let message = {
+            from: '',
+            to: '',
+            text: '',
+            type: '',
+            time: ''
+        }
+        const newMessage = req.body
+        message.from = stripHtml(req.headers.user).result.trim()
+        message.to = stripHtml(newMessage.to).result.trim()
+        message.text = stripHtml(newMessage.text).result.trim()
+        message.type = stripHtml(newMessage.type).result.trim()
+        message.time = (new Date()).toLocaleTimeString()
+        messageSchema.validate(message);
+        res.status(200).send('Messagem enviada')}
     catch (error){
         res.status(404).send('Erro na validação dos dados')
     }
