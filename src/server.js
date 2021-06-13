@@ -71,6 +71,9 @@ app.post("/messages", (req, res) => {
         message.to = stripHtml(newMessage.to).result.trim()
         message.text = stripHtml(newMessage.text).result.trim()
         message.type = stripHtml(newMessage.type).result.trim()
+        if (message.type === 'message' || message.type === 'private_message'){
+            res.status(404).send('Erro na validação dos dados')
+        }
         message.time = (new Date()).toLocaleTimeString()
         messageSchema.validate(message);
         messages.push(message)
@@ -81,13 +84,14 @@ app.post("/messages", (req, res) => {
 })
 
 app.get("/messages", (req, res) => {
+    const filtered_messages = messages.filter(message => ((message.type === 'private_message' && message.to === req.headers.user) || message.type === 'message'))
     try {
         if (typeof req.query.limit != 'undefined'){
             let limit = parseInt(req.query.limit)
-            res.status(200).send(messages.slice(-limit))
+            res.status(200).send(filtered_messages.slice(-limit))
         }
         else {
-            res.status(200).send(messages)
+            res.status(200).send(filtered_messages)
         }
     }
     catch {
