@@ -1,7 +1,7 @@
 {
   "name": "12_api_bate_papo_uol",
   "version": "1.0.0",
-  "type" : "module",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "dayjs": "^1.10.5"
   },
   "devDependencies": {
     "express": "^4.17.1",
