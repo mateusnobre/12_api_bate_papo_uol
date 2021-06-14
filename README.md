@@ -4,8 +4,8 @@
 Backend built with Express.js for messaging website.
 
 
-You can check it out at: https://12-api-bate-papo-uol.vercel.app/
+You can check it out at: https://api-bate-papo-uol-12.herokuapp.com/
  
 
 ## Preview
-![image](./asssets/imagens/preview.png)
+![image](./public/assets/imagens/preview.png)

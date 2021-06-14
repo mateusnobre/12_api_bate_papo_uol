@@ -20,8 +20,29 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"))
 
-const participants = [];
-const messages = [];
+let participants = [];
+let messages = [];
+function removeParticipants(){
+    for (let i = 0; i < participants.length; i++){ 
+        if((Date.now() - participants[i].lastStatus) > 10000){
+            let message = {
+                from: '',
+                to: '',
+                text: '',
+                type: '',
+                time: ''
+            }
+            message.from = participants[i].name
+            message.to = 'Todos'
+            message.text = 'sai da sala...'
+            message.type = 'status'
+            message.time = (new Date()).toLocaleTimeString()
+            messages = [...messages, message]
+            participants = participants.filter(participant => participant.name !== participants[i].name);
+        }
+    }
+}
+setInterval(removeParticipants, 15000);
 
 app.post("/participants", (req, res) => {
     try {
@@ -36,7 +57,6 @@ app.post("/participants", (req, res) => {
             type: '',
             time: ''
         }
-        console.log(req.body)
         const newMessage = req.body
         message.from = newMessage.name
         message.to = 'Todos'
@@ -46,8 +66,8 @@ app.post("/participants", (req, res) => {
         participant.name = stripHtml(newMessage.name).result.trim();
         participant.lastStatus = Date.now();
         participantSchema.validate(participant)
-        participants.push(participant);
-        messages.push(message)
+        participants = [...participants, participant];
+        messages = [...messages, message]
         res.status(200).send('Usuário Cadastrado');
     }
     catch (error){
@@ -60,7 +80,7 @@ app.get("/participants", (req, res) => {
 })
 
 app.post("/messages", (req, res) => {
-    if (!req.body.type === 'message' && !req.body.type === 'private_message'){
+    if (!req.body.type === 'status' && !req.body.type === 'message' && !req.body.type === 'private_message'){
         res.status(404).send('Tipo de mensagem inválido')
     }
     else {
@@ -88,7 +108,7 @@ app.post("/messages", (req, res) => {
 })
 
 app.get("/messages", (req, res) => {
-    const filtered_messages = messages.filter(message => ((message.type === 'private_message' && message.to === req.headers.user) || message.type === 'message'))
+    const filtered_messages = messages.filter(message => ((message.type === 'private_message' && message.to === req.headers.user) || message.to === 'Todos'))
     try {
         if (typeof req.query.limit != 'undefined'){
             let limit = parseInt(req.query.limit)
